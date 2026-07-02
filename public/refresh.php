@@ -22,7 +22,7 @@ if ($returnTo[0] !== '/' || $parsed === false || isset($parsed['scheme']) || iss
 
 try {
     $appRoot = app_root();
-    $phpPath = PHP_BINARY ?: '/usr/bin/php';
+    $phpPath = (PHP_SAPI === 'cli' && PHP_BINARY) ? PHP_BINARY : (PHP_BINDIR . '/php');
     allegro_write_dashboard_refresh_state([
         'status' => 'queued',
         'requested_at' => gmdate(\DateTimeInterface::ATOM),
