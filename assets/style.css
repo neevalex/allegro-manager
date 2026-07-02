@@ -1019,6 +1019,92 @@ pre.code {
   pointer-events: none;
 }
 
+/* WooCommerce page */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+}
+
+table th,
+table td {
+  padding: 12px 10px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+table th {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.product-cell {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  min-width: 260px;
+}
+
+.product-cell .thumb {
+  width: 120px;
+  max-width: 120px;
+  border-radius: 14px;
+}
+
+.product-title {
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.product-title a {
+  color: var(--amber-dark);
+  text-decoration: none;
+}
+
+.product-title a:hover {
+  text-decoration: underline;
+}
+
+.product-meta {
+  margin-top: 4px;
+  display: grid;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-actions .btn {
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 11px;
+  font-size: 13px;
+}
+
+.page-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0 11px;
+  border-radius: 11px;
+  border: 1px solid #ff6b00;
+  background: #ff6b00;
+  color: #fff;
+  font-weight: 700;
+}
+
 /* Responsive design */
 @media (max-width: 900px) {
   .grid,
@@ -1063,6 +1149,21 @@ pre.code {
   .pagination {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .product-cell {
+    grid-template-columns: 96px minmax(0, 1fr);
+    min-width: 220px;
+  }
+
+  .product-cell .thumb {
+    width: 96px;
+    max-width: 96px;
+  }
+
+  .table-actions {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1192,6 +1293,23 @@ pre.code {
     min-width: 34px;
     padding: 0 10px;
     font-size: 13px;
+  }
+
+  .page-current {
+    min-height: 34px;
+    min-width: 34px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .product-cell {
+    grid-template-columns: 1fr;
+    min-width: 180px;
+  }
+
+  .product-cell .thumb {
+    width: 82px;
+    max-width: 82px;
   }
 
   .stats-grid {
