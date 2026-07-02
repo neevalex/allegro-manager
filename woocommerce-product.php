@@ -234,7 +234,7 @@ if ($wooConfigured && $productId > 0) {
                     <?php endif; ?>
                     <div>
                       <strong>#<?= h((string)$variation['id']) ?></strong>
-                      <div class="helper">Weight: <?= h($variation['weight'] !== '' ? $variation['weight'] : '—') ?> · Dimensions: <?= h(format_dimensions($variation['dimensions'])) ?></div>
+                      <div class="helper"></div>
                     </div>
                   </div>
                 </td>
