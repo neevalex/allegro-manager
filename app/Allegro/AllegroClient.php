@@ -182,6 +182,11 @@ final class AllegroClient
         }
     }
 
+    public function getProductOffer(string $offerId): ?array
+    {
+        return $this->getOfferProduct($offerId);
+    }
+
     public function updateOfferProduct(string $offerId, array $product): bool
     {
         try {
@@ -190,6 +195,11 @@ final class AllegroClient
         } catch (Throwable) {
             return false;
         }
+    }
+
+    public function updateProductOffer(string $offerId, array $product): array
+    {
+        return $this->offers->updateProduct($offerId, $product);
     }
 
     public function createOffer(array $offer): ?array
