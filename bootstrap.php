@@ -1,7 +1,7 @@
 <?php
 /**
  * Bootstrap - initializes common dependencies for all views.
- * 
+ *
  * Provides:
  * - AllegroClient and configuration
  * - Common utility functions for HTML escaping and formatting
