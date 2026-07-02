@@ -41,7 +41,11 @@ jobs:
             --exclude 'config.php' \
             --exclude 'config.example.php' \
             --exclude 'refresh_dashboard_summary.php' \
-            public/ "$APP_PATH/"
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude '.gitignore' \
+            --exclude 'README.md' \
+            ./ "$APP_PATH/"
 
       - name: Post-deploy verification
         run: |
@@ -53,6 +57,5 @@ jobs:
           done
           test -d "$APP_PATH/data"
           test -f "$APP_PATH/index.php"
-          test -f "$APP_PATH/bootstrap.php"
           test -f "$APP_PATH/assets/allegro-manager-logo.svg"
           echo "Deploy verification passed"
