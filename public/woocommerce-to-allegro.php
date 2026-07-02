@@ -1011,7 +1011,6 @@ if ($productId <= 0) {
                   </div>
                 </summary>
                 <div class="item-body">
-                  <p class="helper" style="margin:0 0 16px;">Expanded editor for Woo variation ID <?= h((string)$item['woo_variation_id']) ?>. Summary data stays in the collapsed header above.</p>
                   <?php if (!empty($item['source']['allegro_frontend_url']) || !empty($item['source']['allegro_backend_url'])): ?>
                     <div class="link-row">
                       <?php if (!empty($item['source']['allegro_frontend_url'])): ?><a class="mini-link" href="<?= h((string)$item['source']['allegro_frontend_url']) ?>" target="_blank" rel="noopener noreferrer">Frontend ↗</a><?php endif; ?>
