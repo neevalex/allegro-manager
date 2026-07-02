@@ -14,6 +14,19 @@ declare(strict_types=1);
  * or use the namespaced versions from \App namespace.
  */
 
+// Load all required class files first (order matters for dependencies)
+require_once __DIR__ . '/Allegro/AllegroConfig.php';
+require_once __DIR__ . '/Allegro/JsonStore.php';
+require_once __DIR__ . '/Allegro/Http/HttpClient.php';
+require_once __DIR__ . '/Allegro/Auth/OAuth2Client.php';
+require_once __DIR__ . '/Allegro/Offers/OfferNormalizer.php';
+require_once __DIR__ . '/Allegro/Offers/OffersService.php';
+require_once __DIR__ . '/Allegro/Dashboard/Aggregates.php';
+require_once __DIR__ . '/Allegro/Dashboard/DashboardService.php';
+require_once __DIR__ . '/Allegro/AllegroClient.php';
+require_once __DIR__ . '/WooCommerce/ProductNormalizer.php';
+require_once __DIR__ . '/WooCommerce/WooCommerceClient.php';
+
 // Allegro namespace imports
 use App\Allegro\AllegroConfig;
 use App\Allegro\AllegroClient as AllegroClientImpl;
