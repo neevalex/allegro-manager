@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__) . '/public/bootstrap.php';
+$bootstrap = __DIR__ . '/bootstrap.php';
+if (!file_exists($bootstrap)) {
+    $bootstrap = dirname(__DIR__) . '/public/bootstrap.php';
+}
+require_once $bootstrap;
 
 $action = $_GET['action'] ?? 'start';
 

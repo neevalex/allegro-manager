@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__) . '/public/bootstrap.php';
+$bootstrap = __DIR__ . '/bootstrap.php';
+if (!file_exists($bootstrap)) {
+    $bootstrap = dirname(__DIR__) . '/public/bootstrap.php';
+}
+require_once $bootstrap;
 
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/offer.php', PHP_URL_PATH) ?: '/offer.php';
 
