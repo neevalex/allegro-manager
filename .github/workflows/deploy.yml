@@ -19,7 +19,6 @@ jobs:
 
     env:
       APP_PATH: /var/www/allegro-manager
-      WEB_PATH: /var/www/html/allegro
 
     steps:
       - name: Checkout repository
@@ -27,25 +26,33 @@ jobs:
 
       - name: Ensure runtime directories exist
         run: |
-          mkdir -p "$APP_PATH/app" "$APP_PATH/data/woo-allegro-drafts" "$APP_PATH/data/woo-allegro-logs" "$WEB_PATH/assets"
+          mkdir -p "$APP_PATH/app" "$APP_PATH/assets" "$APP_PATH/data/woo-allegro-drafts" "$APP_PATH/data/woo-allegro-logs"
 
       - name: Deploy shared app code
         run: |
           rsync -az --delete --exclude '.gitkeep' app/ "$APP_PATH/app/"
           rsync -az config.example.php refresh_dashboard_summary.php "$APP_PATH/"
 
-      - name: Deploy web root
+      - name: Deploy web root into app root
         run: |
-          rsync -az --delete public/ "$WEB_PATH/"
+          rsync -az --delete \
+            --exclude 'app/' \
+            --exclude 'data/' \
+            --exclude 'config.php' \
+            --exclude 'config.example.php' \
+            --exclude 'refresh_dashboard_summary.php' \
+            public/ "$APP_PATH/"
 
       - name: Post-deploy verification
         run: |
           set -e
-          php -l /var/www/allegro-manager/app/AllegroClient.php >/dev/null
-          php -l /var/www/allegro-manager/refresh_dashboard_summary.php >/dev/null
-          for file in /var/www/html/allegro/*.php; do
+          php -l "$APP_PATH/app/AllegroClient.php" >/dev/null
+          php -l "$APP_PATH/refresh_dashboard_summary.php" >/dev/null
+          for file in "$APP_PATH"/*.php; do
             php -l "$file" >/dev/null
           done
-          test -d /var/www/allegro-manager/data
-          test -f /var/www/html/allegro/index.php
+          test -d "$APP_PATH/data"
+          test -f "$APP_PATH/index.php"
+          test -f "$APP_PATH/bootstrap.php"
+          test -f "$APP_PATH/assets/allegro-manager-logo.svg"
           echo "Deploy verification passed"
