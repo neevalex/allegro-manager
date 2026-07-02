@@ -9,8 +9,14 @@
  */
 declare(strict_types=1);
 
+// Determine app root with flexible path resolution
+$appRoot = __DIR__;
+if (basename($appRoot) === 'public') {
+    $appRoot = dirname($appRoot);
+}
+
 // Load the backward compat wrapper which loads all classes
-require_once dirname(__DIR__) . '/app/AllegroClient.php';
+require_once $appRoot . '/app/AllegroClient.php';
 
 // Common utility functions
 function h(?string $value): string
@@ -81,7 +87,11 @@ function home_url(string $path = ''): string
 
 function app_root(): string
 {
-    return dirname(__DIR__);
+    $root = __DIR__;
+    if (basename($root) === 'public') {
+        $root = dirname($root);
+    }
+    return $root;
 }
 
 function data_root(): string
