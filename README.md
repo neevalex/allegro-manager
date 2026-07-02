@@ -78,25 +78,3 @@ data/woo-allegro-logs/
 This repository includes `.github/workflows/deploy.yml`.
 
 On every push to `main` (and on manual `workflow_dispatch`), GitHub Actions can deploy the app back to the live server over SSH.
-
-### Required GitHub repository secrets
-
-- `DEPLOY_HOST`
-- `DEPLOY_PORT` (optional, defaults to `22`)
-- `DEPLOY_USER`
-- `DEPLOY_SSH_KEY`
-
-The workflow deploys:
-
-- `app/` -> `/var/www/allegro-manager/app/`
-- `config.example.php` -> `/var/www/allegro-manager/`
-- `refresh_dashboard_summary.php` -> `/var/www/allegro-manager/`
-- `public/` -> `/var/www/html/allegro/`
-
-It does **not** overwrite runtime data under `/var/www/allegro-manager/data/`.
-
-## Notes
-
-- The web UI uses absolute server paths in a few places for the current deployment layout.
-- `config.php` is for local/static defaults; runtime settings are expected in `data/settings.json`.
-- Never commit secrets, tokens, or exported runtime data.
