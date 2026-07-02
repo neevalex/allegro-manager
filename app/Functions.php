@@ -1,15 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace App;
-
 use App\Allegro\AllegroClient;
 use App\Allegro\AllegroConfig;
-use DateTimeInterface;
-use Throwable;
 
 /**
  * Token safety check - returns metadata about authorization status.
+ * 
+ * Global function in root namespace for backward compatibility.
  */
 function allegro_safe_token_status(?array $token): array
 {
@@ -35,7 +33,7 @@ function allegro_refresh_dashboard_cache(
     ?string $target = null
 ): array {
     $payload = [
-        'generated_at' => gmdate(DateTimeInterface::ATOM),
+        'generated_at' => gmdate(\DateTimeInterface::ATOM),
         'ok' => false,
         'data' => null,
         'error' => null,
@@ -52,7 +50,7 @@ function allegro_refresh_dashboard_cache(
         }
         $payload['data'] = $client->dashboard()->getSummary();
         $payload['ok'] = true;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         $payload['error'] = $e->getMessage();
     }
 
