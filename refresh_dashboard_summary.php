@@ -12,7 +12,24 @@ if ($lockHandle === false) {
     fwrite(STDERR, "Could not open {$lockPath}\n");
     exit(1);
 }
-if (!flock($lockHandle, LOCK_EX | LOCK_NB)) {
+$locked = flock($lockHandle, LOCK_EX | LOCK_NB);
+if (!$locked) {
+    $existing = allegro_read_dashboard_refresh_state($statePath) ?? [];
+    $existingPid = (int)($existing['pid'] ?? 0);
+    // Check if the recorded PID is still running (stale-process cleanup)
+    if ($existingPid > 0 && function_exists('posix_kill')) {
+        if (posix_kill($existingPid, 0) === false) {
+            // PID is dead, clean up the stale lock
+            fclose($lockHandle);
+            @unlink($lockPath);
+            $lockHandle = fopen($lockPath, 'c+');
+            if ($lockHandle !== false && flock($lockHandle, LOCK_EX | LOCK_NB)) {
+                $locked = true;
+            }
+        }
+    }
+}
+if (!$locked) {
     $existing = allegro_read_dashboard_refresh_state($statePath) ?? [];
     echo json_encode([
         'target' => __DIR__ . '/data/dashboard-summary.json',
