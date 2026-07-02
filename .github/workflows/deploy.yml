@@ -55,6 +55,10 @@ jobs:
           for file in "$APP_PATH"/*.php; do
             php -l "$file" >/dev/null
           done
+          if grep -R "'/var/www/public/bootstrap.php'\|\"/var/www/public/bootstrap.php\"" "$APP_PATH"/*.php; then
+            echo "Found stale bootstrap include path in deployed root PHP files"
+            exit 1
+          fi
           test -d "$APP_PATH/data"
           test -f "$APP_PATH/index.php"
           test -f "$APP_PATH/assets/allegro-manager-logo.svg"
