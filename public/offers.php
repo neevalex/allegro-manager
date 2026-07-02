@@ -1,19 +1,8 @@
 <?php
 declare(strict_types=1);
-require_once '/var/www/allegro-manager/app/AllegroClient.php';
+require_once dirname(__DIR__) . '/public/bootstrap.php';
 
-$config = AllegroConfig::load();
-$configured = AllegroConfig::isConfigured($config);
-$client = new AllegroClient($config);
-$token = $client->token();
-$status = allegro_safe_token_status($token);
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/offers.php', PHP_URL_PATH) ?: '/offers.php';
-$navTabs = [
-    ['label' => 'Dashboard', 'href' => '/', 'match' => ['/']],
-    ['label' => 'Offers', 'href' => '/offers.php', 'match' => ['/offers.php', '/offer.php']],
-    ['label' => 'WooCommerce', 'href' => '/woocommerce.php', 'match' => ['/woocommerce.php', '/woocommerce-product.php', '/woocommerce-to-allegro.php']],
-    ['label' => 'Settings', 'href' => '/settings.php', 'match' => ['/settings.php']],
-];
 
 $page = max(1, (int)($_GET['page'] ?? 1));
 $sort = is_string($_GET['sort'] ?? null) ? (string)$_GET['sort'] : 'created_desc';
@@ -42,27 +31,6 @@ if ($configured && $status['authorized']) {
     }
 }
 
-function h(?string $value): string { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
-function fmt_time(?int $ts): string { return $ts ? date('Y-m-d H:i:s T', $ts) : '—'; }
-function fmt_duration(?int $seconds): string {
-    if ($seconds === null) return '—';
-    $d = intdiv($seconds, 86400); $seconds %= 86400;
-    $h = intdiv($seconds, 3600); $seconds %= 3600;
-    $m = intdiv($seconds, 60);
-    return ($d ? $d . 'd ' : '') . ($h ? $h . 'h ' : '') . $m . 'm';
-}
-function fmt_money($amount, ?string $currency): string {
-    if ($amount === null || !is_numeric($amount)) return '—';
-    return number_format((float)$amount, 2, '.', ' ') . ' ' . ($currency ?: 'PLN');
-}
-function fmt_iso_time(?string $value): string {
-    if (!$value) return '—';
-    try {
-        return (new DateTimeImmutable($value))->setTimezone(new DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s T');
-    } catch (Throwable) {
-        return $value;
-    }
-}
 function build_offers_url(int $page, string $sort, string $title = '', string $sku = '', string $status = ''): string {
     $params = ['page' => $page, 'sort' => $sort];
     if ($title !== '') $params['title'] = $title;

@@ -1,21 +1,10 @@
 <?php
 declare(strict_types=1);
-require_once '/var/www/allegro-manager/app/AllegroClient.php';
+require_once dirname(__DIR__) . '/public/bootstrap.php';
 
-$config = AllegroConfig::load();
-$configured = AllegroConfig::isConfigured($config);
 $wooConfigured = AllegroConfig::isWooConfigured($config);
-$client = new AllegroClient($config);
-$token = $client->token();
-$status = allegro_safe_token_status($token);
 $wooClient = new WooCommerceClient($config);
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/woocommerce-to-allegro.php', PHP_URL_PATH) ?: '/woocommerce-to-allegro.php';
-$navTabs = [
-    ['label' => 'Dashboard', 'href' => '/', 'match' => ['/']],
-    ['label' => 'Offers', 'href' => '/offers.php', 'match' => ['/offers.php', '/offer.php']],
-    ['label' => 'WooCommerce', 'href' => '/woocommerce.php', 'match' => ['/woocommerce.php', '/woocommerce-product.php', '/woocommerce-to-allegro.php']],
-    ['label' => 'Settings', 'href' => '/settings.php', 'match' => ['/settings.php']],
-];
 
 $productId = max(0, (int)($_GET['id'] ?? $_POST['id'] ?? 0));
 $back = is_string($_GET['back'] ?? null) ? rawurldecode((string)$_GET['back']) : (is_string($_POST['back'] ?? null) ? rawurldecode((string)$_POST['back']) : '/woocommerce.php');
@@ -38,28 +27,11 @@ $refreshMeta = allegro_read_dashboard_refresh_state();
 $trackedItems = [];
 $lastLogPreview = '';
 
-function h(?string $value): string { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
-function fmt_iso_time(?string $value): string {
-    if (!$value) return '—';
-    try {
-        return (new DateTimeImmutable($value))->setTimezone(new DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s T');
-    } catch (Throwable) {
-        return $value;
-    }
-}
-function fmt_decimal(float $value, int $precision = 2): string {
-    $formatted = number_format($value, $precision, '.', '');
-    return rtrim(rtrim($formatted, '0'), '.');
-}
 function safe_slug(string $value): string {
     $value = strtolower(trim($value));
     $value = preg_replace('/[^a-z0-9]+/i', '-', $value) ?: 'item';
     return trim($value, '-') ?: 'item';
 }
-function data_root(): string { return '/var/www/allegro-manager/data'; }
-function draft_dir(): string { return data_root() . '/woo-allegro-drafts'; }
-function log_dir(): string { return data_root() . '/woo-allegro-logs'; }
-function registry_path(): string { return data_root() . '/woo-allegro-created-products.json'; }
 function draft_path(int $productId): string { return draft_dir() . '/product-' . $productId . '.json'; }
 function ensure_dir(string $path): void {
     if (!is_dir($path)) {

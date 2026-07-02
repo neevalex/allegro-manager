@@ -140,4 +140,78 @@ final class AllegroClient
         }
         return $result;
     }
+
+    // Backward compatibility wrappers (old monolithic API)
+    public function authorizationUrl(): string
+    {
+        return $this->getAuthorizationUrl();
+    }
+
+    public function handleCallback(string $code, string $state): array
+    {
+        return $this->handleOAuthCallback($code, $state);
+    }
+
+    public function token(): ?array
+    {
+        return $this->getToken();
+    }
+
+    public function refreshNow(): array
+    {
+        return $this->refreshToken();
+    }
+
+    public function listOffersPage(
+        int $page = 1,
+        int $limit = 100,
+        string $sort = 'newest',
+        string $titleQuery = '',
+        string $skuQuery = '',
+        string $statusFilter = ''
+    ): array {
+        return $this->offers->listPage($page, $limit, $sort, $titleQuery, $skuQuery, $statusFilter);
+    }
+
+    public function getOfferProduct(string $offerId): ?array
+    {
+        try {
+            return $this->offers->getProduct($offerId);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    public function updateOfferProduct(string $offerId, array $product): bool
+    {
+        try {
+            $this->offers->updateProduct($offerId, $product);
+            return true;
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    public function createOffer(array $offer): ?array
+    {
+        try {
+            return $this->offers->create($offer);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    public function getLatestOfferAsTemplate(): ?array
+    {
+        try {
+            return $this->offers->getLatestAsTemplate();
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    public function getDashboardSummary(): array
+    {
+        return $this->dashboard->getSummary();
+    }
 }

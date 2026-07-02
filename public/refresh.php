@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once '/var/www/allegro-manager/app/AllegroClient.php';
+require_once dirname(__DIR__) . '/public/bootstrap.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     http_response_code(405);
@@ -9,7 +9,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     exit;
 }
 
-$config = AllegroConfig::load();
 $returnTo = (string)($_POST['return_to'] ?? '/');
 $returnTo = $returnTo !== '' ? $returnTo : '/';
 $parsed = parse_url($returnTo);
@@ -18,20 +17,28 @@ if ($returnTo[0] !== '/' || $parsed === false || isset($parsed['scheme']) || iss
 }
 
 try {
+    $appRoot = app_root();
+    $phpPath = PHP_BINARY ?: '/usr/bin/php';
     allegro_write_dashboard_refresh_state([
         'status' => 'queued',
-        'requested_at' => gmdate(DateTimeInterface::ATOM),
+        'requested_at' => gmdate(\DateTimeInterface::ATOM),
         'source' => 'web',
         'return_to' => $returnTo,
     ]);
-    $cmd = 'cd /var/www/allegro-manager && /usr/bin/php /var/www/allegro-manager/refresh_dashboard_summary.php >/var/www/allegro-manager/data/manual-refresh.log 2>&1 & echo $!';
+    $cmd = sprintf(
+        'cd %s && %s %s/refresh_dashboard_summary.php >%s/data/manual-refresh.log 2>&1 & echo $!',
+        escapeshellarg($appRoot),
+        escapeshellarg($phpPath),
+        escapeshellarg($appRoot),
+        escapeshellarg($appRoot)
+    );
     $pid = trim((string)shell_exec($cmd));
     if ($pid === '') {
-        throw new RuntimeException('Could not start dashboard refresh process.');
+        throw new \RuntimeException('Could not start dashboard refresh process.');
     }
     $state = allegro_read_dashboard_refresh_state() ?? [];
     $state['status'] = $state['status'] ?? 'queued';
-    $state['requested_at'] = $state['requested_at'] ?? gmdate(DateTimeInterface::ATOM);
+    $state['requested_at'] = $state['requested_at'] ?? gmdate(\DateTimeInterface::ATOM);
     $state['pid'] = (int)$pid;
     $state['source'] = 'web';
     $state['return_to'] = $returnTo;
@@ -40,7 +47,7 @@ try {
         'refresh' => 'started',
         'refresh_pid' => $pid,
     ];
-} catch (Throwable $e) {
+} catch (\Throwable $e) {
     $params = [
         'refresh' => 'error',
         'refresh_message' => $e->getMessage(),

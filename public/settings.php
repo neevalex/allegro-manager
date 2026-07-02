@@ -1,21 +1,10 @@
 <?php
 declare(strict_types=1);
-require_once '/var/www/allegro-manager/app/AllegroClient.php';
+require_once dirname(__DIR__) . '/public/bootstrap.php';
 
-$config = AllegroConfig::load();
-$configured = AllegroConfig::isConfigured($config);
 $wooConfigured = AllegroConfig::isWooConfigured($config);
-$client = new AllegroClient($config);
-$token = $client->token();
-$status = allegro_safe_token_status($token);
 $wooClient = new WooCommerceClient($config);
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/settings.php', PHP_URL_PATH) ?: '/settings.php';
-$navTabs = [
-    ['label' => 'Dashboard', 'href' => '/', 'match' => ['/']],
-    ['label' => 'Offers', 'href' => '/offers.php', 'match' => ['/offers.php', '/offer.php']],
-    ['label' => 'WooCommerce', 'href' => '/woocommerce.php', 'match' => ['/woocommerce.php', '/woocommerce-product.php', '/woocommerce-to-allegro.php']],
-    ['label' => 'Settings', 'href' => '/settings.php', 'match' => ['/settings.php']],
-];
 
 $me = null;
 $error = null;
@@ -32,23 +21,6 @@ $refreshReturnTo = (string)($_SERVER['REQUEST_URI'] ?? '/settings.php');
 $refreshMeta = allegro_read_dashboard_refresh_state();
 $dashboardCacheMeta = null;
 
-function h(?string $value): string { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
-function fmt_time(?int $ts): string { return $ts ? date('Y-m-d H:i:s T', $ts) : '—'; }
-function fmt_duration(?int $seconds): string {
-    if ($seconds === null) return '—';
-    $d = intdiv($seconds, 86400); $seconds %= 86400;
-    $h = intdiv($seconds, 3600); $seconds %= 3600;
-    $m = intdiv($seconds, 60);
-    return ($d ? $d . 'd ' : '') . ($h ? $h . 'h ' : '') . $m . 'm';
-}
-function fmt_iso_time(?string $value): string {
-    if (!$value) return '—';
-    try {
-        return (new DateTimeImmutable($value))->setTimezone(new DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s T');
-    } catch (Throwable) {
-        return $value;
-    }
-}
 function mask_secret(?string $value, int $prefix = 4, int $suffix = 4): string {
     $value = trim((string)$value);
     if ($value === '') return 'not saved';
