@@ -201,6 +201,11 @@ final class AllegroClient
         }
     }
 
+    public function createProductOffer(array $offer): array
+    {
+        return $this->offers->create($offer);
+    }
+
     public function getLatestOfferAsTemplate(): ?array
     {
         try {
@@ -208,6 +213,11 @@ final class AllegroClient
         } catch (Throwable) {
             return null;
         }
+    }
+
+    public function latestOfferCreationTemplate(): ?array
+    {
+        return $this->getLatestOfferAsTemplate();
     }
 
     public function getDashboardSummary(): array
