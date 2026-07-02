@@ -1,0 +1,34 @@
+# Secrets / local config
+config.php
+*.env
+.env*
+
+# Runtime data
+/data/*
+!/data/.gitkeep
+!/data/woo-allegro-drafts/
+!/data/woo-allegro-drafts/.gitkeep
+!/data/woo-allegro-logs/
+!/data/woo-allegro-logs/.gitkeep
+/data/settings.json
+/data/tokens.json
+/data/oauth-state.json
+/data/dashboard-summary.json
+/data/dashboard-refresh-state.json
+/data/dashboard-refresh.lock
+/data/manual-refresh.log
+/data/woo-allegro-created-products.json
+/data/woo-allegro-drafts/*.json
+/data/woo-allegro-logs/*.log
+
+# Backups / noise
+*.log
+*.bak
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Editor / tooling
+.vscode/
+.idea/
