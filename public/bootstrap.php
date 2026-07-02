@@ -19,58 +19,72 @@ if (basename($appRoot) === 'public') {
 require_once $appRoot . '/app/AllegroClient.php';
 
 // Common utility functions
-function h(?string $value): string
-{
-    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
-}
-
-function fmt_time(?int $ts): string
-{
-    return $ts ? date('Y-m-d H:i:s T', $ts) : '—';
-}
-
-function fmt_duration(?int $seconds): string
-{
-    if ($seconds === null) {
-        return '—';
-    }
-    $d = intdiv($seconds, 86400); $seconds %= 86400;
-    $h = intdiv($seconds, 3600); $seconds %= 3600;
-    $m = intdiv($seconds, 60);
-    return ($d ? $d . 'd ' : '') . ($h ? $h . 'h ' : '') . $m . 'm';
-}
-
-function fmt_money($amount, ?string $currency): string
-{
-    if ($amount === null || !is_numeric($amount)) {
-        return '—';
-    }
-    return number_format((float)$amount, 2, '.', ' ') . ' ' . ($currency ?: 'PLN');
-}
-
-function fmt_iso_time(?string $value): string
-{
-    if (!$value) {
-        return '—';
-    }
-    try {
-        return (new \DateTimeImmutable($value))->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s T');
-    } catch (\Throwable) {
-        return $value;
+if (!function_exists('h')) {
+    function h(?string $value): string
+    {
+        return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
     }
 }
 
-function fmt_amount(?array $amount): string
-{
-    if (!$amount) {
-        return '—';
+if (!function_exists('fmt_time')) {
+    function fmt_time(?int $ts): string
+    {
+        return $ts ? date('Y-m-d H:i:s T', $ts) : '—';
     }
-    return fmt_money($amount['amount'] ?? null, $amount['currency'] ?? null);
 }
 
-function fmt_decimal(?float $value, int $decimals = 2): string
-{
-    return $value !== null ? number_format($value, $decimals, '.', ' ') : '—';
+if (!function_exists('fmt_duration')) {
+    function fmt_duration(?int $seconds): string
+    {
+        if ($seconds === null) {
+            return '—';
+        }
+        $d = intdiv($seconds, 86400); $seconds %= 86400;
+        $h = intdiv($seconds, 3600); $seconds %= 3600;
+        $m = intdiv($seconds, 60);
+        return ($d ? $d . 'd ' : '') . ($h ? $h . 'h ' : '') . $m . 'm';
+    }
+}
+
+if (!function_exists('fmt_money')) {
+    function fmt_money($amount, ?string $currency): string
+    {
+        if ($amount === null || !is_numeric($amount)) {
+            return '—';
+        }
+        return number_format((float)$amount, 2, '.', ' ') . ' ' . ($currency ?: 'PLN');
+    }
+}
+
+if (!function_exists('fmt_iso_time')) {
+    function fmt_iso_time(?string $value): string
+    {
+        if (!$value) {
+            return '—';
+        }
+        try {
+            return (new \DateTimeImmutable($value))->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s T');
+        } catch (\Throwable) {
+            return $value;
+        }
+    }
+}
+
+if (!function_exists('fmt_amount')) {
+    function fmt_amount(?array $amount): string
+    {
+        if (!$amount) {
+            return '—';
+        }
+        return fmt_money($amount['amount'] ?? null, $amount['currency'] ?? null);
+    }
+}
+
+if (!function_exists('fmt_decimal')) {
+    function fmt_decimal(?float $value, int $decimals = 2): string
+    {
+        return $value !== null ? number_format($value, $decimals, '.', ' ') : '—';
+    }
 }
 
 function base_path(): string
