@@ -12,78 +12,34 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - allegro-manager
     timeout-minutes: 20
 
     env:
       APP_PATH: /var/www/allegro-manager
       WEB_PATH: /var/www/html/allegro
-      WEB_ASSETS_PATH: /var/www/html/allegro/assets
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install rsync
-        run: sudo apt-get update && sudo apt-get install -y rsync
-
-      - name: Configure SSH
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      - name: Ensure runtime directories exist
         run: |
-          test -n "$DEPLOY_HOST"
-          test -n "$DEPLOY_USER"
-          test -n "$DEPLOY_SSH_KEY"
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -p "${DEPLOY_PORT:-22}" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-
-      - name: Ensure remote directories exist
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-        run: |
-          ssh -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" \
-            "mkdir -p '$APP_PATH/app' '$APP_PATH/data/woo-allegro-drafts' '$APP_PATH/data/woo-allegro-logs' '$WEB_PATH' '$WEB_ASSETS_PATH'"
+          mkdir -p "$APP_PATH/app" "$APP_PATH/data/woo-allegro-drafts" "$APP_PATH/data/woo-allegro-logs" "$WEB_PATH/assets"
 
       - name: Deploy shared app code
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
         run: |
-          rsync -az --delete \
-            -e "ssh -p ${DEPLOY_PORT:-22}" \
-            --exclude '.gitkeep' \
-            app/ "$DEPLOY_USER@$DEPLOY_HOST:$APP_PATH/app/"
-          rsync -az \
-            -e "ssh -p ${DEPLOY_PORT:-22}" \
-            config.example.php refresh_dashboard_summary.php \
-            "$DEPLOY_USER@$DEPLOY_HOST:$APP_PATH/"
+          rsync -az --delete --exclude '.gitkeep' app/ "$APP_PATH/app/"
+          rsync -az config.example.php refresh_dashboard_summary.php "$APP_PATH/"
 
       - name: Deploy web root
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
         run: |
-          rsync -az --delete \
-            -e "ssh -p ${DEPLOY_PORT:-22}" \
-            public/ "$DEPLOY_USER@$DEPLOY_HOST:$WEB_PATH/"
+          rsync -az --delete public/ "$WEB_PATH/"
 
       - name: Post-deploy verification
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
         run: |
-          ssh -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" <<'EOF'
           set -e
           php -l /var/www/allegro-manager/app/AllegroClient.php >/dev/null
           php -l /var/www/allegro-manager/refresh_dashboard_summary.php >/dev/null
@@ -93,4 +49,3 @@ jobs:
           test -d /var/www/allegro-manager/data
           test -f /var/www/html/allegro/index.php
           echo "Deploy verification passed"
-          EOF
